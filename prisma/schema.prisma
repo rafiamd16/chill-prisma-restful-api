@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int          @id @default(autoincrement())
+  nama_lengkap  String       @db.VarChar(100)
+  email         String       @unique @db.VarChar(100)
+  username      String       @unique @db.VarChar(100)
+  password      String       @db.VarChar(255)
+  token         String?      @db.VarChar(255)
+  role          String       @db.VarChar(50) @default("user")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@map("users")
+}
+
+model Genre {
+  id            Int          @id @default(autoincrement())
+  nama          String       @unique @db.VarChar(100)
+
+  filmGenres    FilmGenre[]
+}
+
+model Film {
+  id            Int           @id @default(autoincrement())
+  judul         String        @db.VarChar(200)
+  durasi        Int?
+  rating        Decimal?      @db.Decimal(3, 1)
+  deskripsi     String?       @db.Text
+  thumbnail     String        @db.VarChar(255)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  filmGenres    FilmGenre[]
+}
+
+model FilmGenre {
+  filmId        Int
+  genreId       Int
+
+  film          Film          @relation(fields: [filmId], references: [id])
+  genre         Genre         @relation(fields: [genreId], references: [id])
+
+  @@id([filmId, genreId])
+
+  @@map("film_genre")
+}
