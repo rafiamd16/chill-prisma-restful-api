@@ -2,15 +2,19 @@ import prisma from '../config/db.js'
 import { ResponseError } from '../error/response-error.js'
 import path from 'path'
 import fs from 'fs'
+import { requestValidate } from '../validation/validation.js'
+import { movieQueryValidation } from '../validation/movie-validation.js'
 
 const movieQueryParams = async (query) => {
-  const page = parseInt(query.page) || 1
-  const limit = parseInt(query.limit) || 10
+  const request = await requestValidate(movieQueryValidation, query)
+
+  const page = parseInt(request.page) || 1
+  const limit = parseInt(request.limit) || 10
   const skip = (page - 1) * limit
-  const sortOrder = query.sort || 'asc'
-  const sortBy = query.sortBy || 'judul'
-  const search = query.search || ''
-  const genreFilter = query.genre
+  const sortOrder = request.sort || 'asc'
+  const sortBy = request.sortBy || 'judul'
+  const search = request.search || ''
+  const genreFilter = request.genre
 
   const where = {
     ...(search && {
@@ -31,7 +35,7 @@ const movieQueryParams = async (query) => {
     }),
   }
 
-  const [total, movies] = await Promise.all([
+  const [total_item, movies] = await Promise.all([
     prisma.film.count({ where }),
     prisma.film.findMany({
       where,
@@ -46,11 +50,11 @@ const movieQueryParams = async (query) => {
 
   return {
     data: movies,
-    paginating: {
-      total,
+    pagination: {
       page,
+      total_item,
+      total_pages: Math.ceil(total_item / limit),
       limit,
-      totalPages: Math.ceil(total / limit),
     },
   }
 }

@@ -14,7 +14,7 @@ export const sendVerificationEmail = async (email, token) => {
     from: process.env.EMAIL_FROM,
     to: email,
     subject: 'Verifikasi Email',
-    html: `<a href="${process.env.BASE_URL}/verify-email?token=${token}">Klik untuk verifikasi email</a>`,
+    html: `<a href="${process.env.BASE_URL}/verify-email?token=${token}">Klik link ini untuk verifikasi email</a>`,
   })
 }
 

@@ -1,15 +1,10 @@
 import movieService from '../services/movie.service.js'
-import {
-  createMovieValidation,
-  movieQueryValidation,
-  updateMovieValidation,
-} from '../validation/movie-validation.js'
+import { createMovieValidation, updateMovieValidation } from '../validation/movie-validation.js'
 import { requestValidate } from '../validation/validation.js'
 
 const movieQueryParams = async (req, res, next) => {
   try {
-    const query = requestValidate(movieQueryValidation, req.query)
-    const result = await movieService.movieQueryParams(query)
+    const result = await movieService.movieQueryParams(req.query)
     res.status(200).json(result)
   } catch (err) {
     next(err)
